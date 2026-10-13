@@ -1,13 +1,101 @@
-import test from 'node:test';import assert from 'node:assert/strict';
-import {newGame,act,rankHand,score,validSave,seededRandom} from '../engine.js';
-const cards=s=>s.split(' ').map(t=>'sc hd'.replaceAll(' ','').indexOf(t.slice(-1))*13+('23456789TJQKA'.indexOf(t[0])));
-test('all ten poker categories, ace low, and no wraparound',()=>{
- const hands=['2s 4c 6h 8d Ts','2s 2c 6h 8d Ts','2s 2c 6h 6d Ts','2s 2c 2h 8d Ts','2s 3c 4h 5d 6s','2s 4s 6s 8s Ts','2s 2c 2h 8d 8s','2s 2c 2h 2d Ts','2s 3s 4s 5s 6s','Ts Js Qs Ks As'];
- hands.forEach((s,tier)=>assert.equal(rankHand(cards(s)).tier,tier));
- assert.equal(rankHand(cards('As 2c 3h 4d 5s')).tier,4);assert.equal(rankHand(cards('As 2s 3s 4s 5s')).tier,8);assert.equal(rankHand(cards('Qs Kc Ah 2d 3s')).tier,0);assert.equal(rankHand([1,2,null,4,5]),null);
+import test from "node:test";
+import assert from "node:assert/strict";
+import {
+  newGame,
+  act,
+  rankHand,
+  score,
+  validSave,
+  seededRandom,
+} from "../engine.js";
+const cards = (s) =>
+  s
+    .split(" ")
+    .map(
+      (t) =>
+        "sc hd".replaceAll(" ", "").indexOf(t.slice(-1)) * 13 +
+        "23456789TJQKA".indexOf(t[0]),
+    );
+test("all ten poker categories, ace low, and no wraparound", () => {
+  const hands = [
+    "2s 4c 6h 8d Ts",
+    "2s 2c 6h 8d Ts",
+    "2s 2c 6h 6d Ts",
+    "2s 2c 2h 8d Ts",
+    "2s 3c 4h 5d 6s",
+    "2s 4s 6s 8s Ts",
+    "2s 2c 2h 8d 8s",
+    "2s 2c 2h 2d Ts",
+    "2s 3s 4s 5s 6s",
+    "Ts Js Qs Ks As",
+  ];
+  hands.forEach((s, tier) => assert.equal(rankHand(cards(s)).tier, tier));
+  assert.equal(rankHand(cards("As 2c 3h 4d 5s")).tier, 4);
+  assert.equal(rankHand(cards("As 2s 3s 4s 5s")).tier, 8);
+  assert.equal(rankHand(cards("Qs Kc Ah 2d 3s")).tier, 0);
+  assert.equal(rankHand([1, 2, null, 4, 5]), null);
 });
-test('shuffle is deterministic and seed-sensitive',()=>{assert.deepEqual(newGame('same'),newGame('same'));assert.notDeepEqual(newGame('same').deck,newGame('different').deck);assert.equal(new Set([...newGame('a').market,...newGame('a').deck]).size,52);});
-test('invalid actions never consume resources or mutate state',()=>{let s=newGame('safe');for(const action of [{type:'finish'},{type:'place',cell:-1,pick:0},{type:'place',cell:25,pick:0},{type:'place',cell:0,pick:3},{type:'swap',a:0,b:1},{type:'swap',a:0,b:0}])assert.equal(act(s,action),s);const before=structuredClone(s);const next=act(s,{type:'place',cell:0,pick:1});assert.deepEqual(s,before);assert.equal(next.board[0],s.market[1]);assert.deepEqual(next.market.slice(0,2),[s.market[0],s.market[2]]);assert.equal(act(next,{type:'place',cell:0,pick:0}),next);});
-test('dot bonus requires BOTH crossing hands at two pair or higher',()=>{const board=Array(25).fill(null);[0,13,1,14,2].forEach((v,i)=>board[5+i]=v);[26,13,27,40,3].forEach((v,i)=>board[i*5+1]=v);assert.equal(score(board).links[0],true);assert.equal(score(board).total,22);board[21]=null;assert.equal(score(board).links[0],false);});
-test('1000 complete games preserve cards, budgets and score invariants',()=>{for(let n=0;n<1000;n++){let s=newGame(`test-${n}`);const random=seededRandom(`policy-${n}`);for(let j=0;j<3;j++)s=act(s,{type:'reroll'});assert.equal(act(s,{type:'reroll'}),s);for(let i=0;i<25;i++){s=act(s,{type:'place',cell:i,pick:Math.floor(random()*3)});assert.ok(validSave(s));}for(let j=0;j<2;j++)s=act(s,{type:'swap',a:j,b:24-j});assert.equal(s.swaps,0);assert.equal(act(s,{type:'swap',a:0,b:24}),s);s=act(s,{type:'finish'});assert.ok(validSave(s));assert.ok(s.finished);assert.ok(score(s.board).total>=0);assert.equal(act(s,{type:'place',cell:0,pick:0}),s);assert.equal(act(s,{type:'reroll'}),s);}});
-test('save validation rejects malformed and duplicate decks',()=>{assert.equal(validSave(null),false);assert.equal(validSave({}),false);const s=newGame('save');assert.ok(validSave(s));s.board[0]=s.market[0];assert.equal(validSave(s),false);});
+test("shuffle is deterministic and seed-sensitive", () => {
+  assert.deepEqual(newGame("same"), newGame("same"));
+  assert.notDeepEqual(newGame("same").deck, newGame("different").deck);
+  assert.equal(
+    new Set([...newGame("a").market, ...newGame("a").deck]).size,
+    52,
+  );
+});
+test("invalid actions never consume resources or mutate state", () => {
+  let s = newGame("safe");
+  for (const action of [
+    { type: "finish" },
+    { type: "place", cell: -1, pick: 0 },
+    { type: "place", cell: 25, pick: 0 },
+    { type: "place", cell: 0, pick: 3 },
+    { type: "swap", a: 0, b: 1 },
+    { type: "swap", a: 0, b: 0 },
+  ])
+    assert.equal(act(s, action), s);
+  const before = structuredClone(s);
+  const next = act(s, { type: "place", cell: 0, pick: 1 });
+  assert.deepEqual(s, before);
+  assert.equal(next.board[0], s.market[1]);
+  assert.deepEqual(next.market.slice(0, 2), [s.market[0], s.market[2]]);
+  assert.equal(act(next, { type: "place", cell: 0, pick: 0 }), next);
+});
+test("dot bonus requires BOTH crossing hands at two pair or higher", () => {
+  const board = Array(25).fill(null);
+  [0, 13, 1, 14, 2].forEach((v, i) => (board[5 + i] = v));
+  [26, 13, 27, 40, 3].forEach((v, i) => (board[i * 5 + 1] = v));
+  assert.equal(score(board).links[0], true);
+  assert.equal(score(board).total, 22);
+  board[21] = null;
+  assert.equal(score(board).links[0], false);
+});
+test("1000 complete games preserve cards, budgets and score invariants", () => {
+  for (let n = 0; n < 1000; n++) {
+    let s = newGame(`test-${n}`);
+    const random = seededRandom(`policy-${n}`);
+    for (let j = 0; j < 3; j++) s = act(s, { type: "reroll" });
+    assert.equal(act(s, { type: "reroll" }), s);
+    for (let i = 0; i < 25; i++) {
+      s = act(s, { type: "place", cell: i, pick: Math.floor(random() * 3) });
+      assert.ok(validSave(s));
+    }
+    for (let j = 0; j < 2; j++) s = act(s, { type: "swap", a: j, b: 24 - j });
+    assert.equal(s.swaps, 0);
+    assert.equal(act(s, { type: "swap", a: 0, b: 24 }), s);
+    s = act(s, { type: "finish" });
+    assert.ok(validSave(s));
+    assert.ok(s.finished);
+    assert.ok(score(s.board).total >= 0);
+    assert.equal(act(s, { type: "place", cell: 0, pick: 0 }), s);
+    assert.equal(act(s, { type: "reroll" }), s);
+  }
+});
+test("save validation rejects malformed and duplicate decks", () => {
+  assert.equal(validSave(null), false);
+  assert.equal(validSave({}), false);
+  const s = newGame("save");
+  assert.ok(validSave(s));
+  s.board[0] = s.market[0];
+  assert.equal(validSave(s), false);
+});

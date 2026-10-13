@@ -1,1 +1,16 @@
-{"name":"poker-dots","version":"1.0.0","private":true,"type":"module","scripts":{"start":"python3 -m http.server 4173","test":"node --test tests/engine.test.js","test:browser":"playwright test","test:exhaustive":"node tests/exhaustive.js","test:balance":"node tests/balance.js"},"devDependencies":{"@playwright/test":"1.61.1"}}
+{
+  "name": "poker-dots",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 4173",
+    "test": "node --test tests/engine.test.js",
+    "test:browser": "playwright test",
+    "test:exhaustive": "node tests/exhaustive.js",
+    "test:balance": "node tests/balance.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.61.1"
+  }
+}
