@@ -1,18 +1,57 @@
-# Poker Dots
+<p align="center">
+  <img src="docs/readme/hero.png" width="100%" alt="Poker Dots. Every card. Two possibilities. A forest-green poker puzzle with 25 spaces, 10 hands, and three gold intersections. Draft, place, connect." />
+</p>
 
-Dots AI agent independently building an original variation of poker as part of a public multi-agent experiment.
+<p align="center">
+  <strong>A poker puzzle where every card belongs to two hands.</strong><br />
+  Draft your cards. Shape the grid. Turn a lucky draw into a clever connection.
+</p>
 
-**Connect your luck.** A quiet, strategic poker drafting puzzle: one grid, ten hands, three golden intersections. Original implementation and visual design; familiar poker-square foundations with a persistent three-card market, crossing bonuses, and limited exchanges. No accounts, ads, wagering, backend, or runtime dependencies.
+<p align="center">
+  <a href="#take-a-seat">Take a seat</a> ·
+  <a href="#the-golden-rule">The golden rule</a> ·
+  <a href="#under-the-table">Rules &amp; field notes</a>
+</p>
 
-## Run locally
+| **01 · DRAFT** | **02 · PLACE** | **03 · CONNECT** |
+| :--- | :--- | :--- |
+| Pick **one of three cards**. The other two stay for your next move. | Find its home on a **5 × 5 grid**. Every row and every column scores. | Build strong hands through the **gold dots**. Make both directions count. |
 
-Requires Python 3. From this directory:
+### The golden rule
+
+> **Two pair or better in both crossing hands = +12 at the dot.**<br />
+> Three golden intersections. Three chances to make the whole table work together.
+
+<p align="center">
+  <strong>3 market refreshes &nbsp; / &nbsp; 2 card swaps &nbsp; / &nbsp; Your best next move</strong><br />
+  <sub>Daily deals · Replayable seeds · Keyboard &amp; touch · No timer · No wagering</sub>
+</p>
+
+### Take a seat
 
 ```sh
 python3 -m http.server 4173
 ```
 
-Open **http://localhost:4173**. Or run `npm start`. Serve over HTTP rather than opening `index.html` directly: the game uses native JavaScript modules. Node is only required for tests. All fonts, icons, styles, and code are local; gameplay needs no external services.
+Open **[localhost:4173](http://localhost:4173)** and make your first connection. No build step. No account. Just a table full of possibilities.
+
+<details>
+<summary><strong>A look at the table ↗</strong></summary>
+
+![Poker Dots desktop gameplay: ivory cards on a forest-green table, a three-card market, and live scoring.](docs/desktop.png)
+
+[See the mobile layout](docs/mobile.png).
+
+</details>
+
+---
+
+### Under the table
+
+The rules, strategy, design decisions, and reproducible checks behind the game.
+
+<details>
+<summary><strong>The complete rules · scoring, controls & saved progress</strong></summary>
 
 ## How to play
 
@@ -45,11 +84,47 @@ Aces are high or low in straights; A–2–3–4–5 is valid, Q–K–A–2–3
 - Validated table state and your all-time best save locally. Storage restrictions do not prevent playing. A new table replaces the current save after confirmation when progress exists.
 - The daily deal uses the **UTC date**. Fresh shuffles create new seeds. Results include a copyable challenge link (`?deal=SEED`); identical seeds produce identical decks. Choices determine subsequent market draws. Daily deals can be replayed, and this is a friendly score challenge, not a secure competitive leaderboard.
 
+</details>
+
+<details>
+<summary><strong>Think two moves ahead · strategy notes</strong></summary>
+
 ## Strategy
 
 Start with pairs, but plan both directions. A high-value flush row may be worth more than several isolated pairs; matching suits is often easier when you keep useful cards in the market. Reserve flexible spaces near the gold dots. A two-pair intersection earns 5 + 5 + 12, making cooperative hands valuable without eclipsing rare poker hands.
 
 Do not refresh a market merely because one card is awkward: the other two remain until used. Save exchanges for the full grid, when moving one card can repair two hands and unlock a dot. Check all four affected lines before swapping. You can experiment with one-step Undo, then replay the same seed to compare entire plans.
+
+</details>
+
+<details>
+<summary><strong>Run it locally · requirements & setup</strong></summary>
+
+## Run locally
+
+Requires Python 3. From this directory:
+
+```sh
+python3 -m http.server 4173
+```
+
+Open **http://localhost:4173**. Or run `npm start`. Serve over HTTP rather than opening `index.html` directly: the game uses native JavaScript modules. Node is only required for tests. All fonts, icons, styles, and code are local; gameplay needs no external services.
+
+</details>
+
+<details>
+<summary><strong>Give it a home · static hosting & GitHub Pages</strong></summary>
+
+## Hosting
+
+The distributable is only **index.html, app.js, engine.js, style.css, and icon.svg**. Upload these five files together to any static web host. Use the repository root as the source; no build command is required. Relative asset paths work under a project subpath such as `/poker-dots/`. HTTPS enables clipboard copying; when unavailable the game displays the challenge URL for manual copying.
+
+For GitHub Pages, the included **Publish game (manual)** workflow creates a clean five-file artifact. The owner can select **GitHub Actions** as the Pages source in repository settings, then run that workflow from Actions. It intentionally does not deploy automatically. This delivery does not change repository visibility or access settings and does not claim a live hosted URL before publication.
+
+</details>
+
+<details>
+<summary><strong>From first deal to final polish · design & iteration</strong></summary>
 
 ## Design and iteration notes
 
@@ -60,6 +135,11 @@ Do not refresh a market merely because one card is awkward: the other two remain
 - **First visual QA:** found excessive desktop lane gaps from aspect-ratio sizing; made cards fill their lanes. The original mobile layout put the market below the board and demanded repeated scrolling. The revised compact market stays at the top while the board scrolls beneath it.
 - **Second usability pass:** made row/column scores tappable for hand explanations, added a 320px layout check and repeatable shared-deal test, and formatted the source for maintenance.
 - **Balance check:** across 100 fixed seeds, blindly taking the first card into the next cell scored mean **13.81**, median **13**, range **2–56**. A simple greedy pair/suit/line heuristic scored mean **116.03**, median **113**, range **45–209**, without refreshes or swaps. This supports 100 as an attainable planning target and 150 as a stretch goal; it is a heuristic comparison, not a human difficulty study. Reproduce with `npm run test:balance`.
+
+</details>
+
+<details>
+<summary><strong>Show the work · tests & balance evidence</strong></summary>
 
 ## Verification
 
@@ -80,11 +160,10 @@ Browser tests cover onboarding, draft selection, placement, swaps, undo, refresh
 
 `Game checks` runs engine, exhaustive, and browser tests on pushes and pull requests, and retains screenshot evidence as an Actions artifact.
 
-## Hosting
+</details>
 
-The distributable is only **index.html, app.js, engine.js, style.css, and icon.svg**. Upload these five files together to any static web host. Use the repository root as the source; no build command is required. Relative asset paths work under a project subpath such as `/poker-dots/`. HTTPS enables clipboard copying; when unavailable the game displays the challenge URL for manual copying.
-
-For GitHub Pages, the included **Publish game (manual)** workflow creates a clean five-file artifact. The owner can select **GitHub Actions** as the Pages source in repository settings, then run that workflow from Actions. It intentionally does not deploy automatically. This delivery does not change repository visibility or access settings and does not claim a live hosted URL before publication.
+<details>
+<summary><strong>Inside the deck · source map</strong></summary>
 
 ## Source map
 
@@ -94,4 +173,12 @@ For GitHub Pages, the included **Publish game (manual)** workflow creates a clea
 - `tests/`: deterministic engine, exhaustive, balance, and browser checks.
 - `.github/workflows/`: continuous checks and owner-triggered static hosting.
 
-The original repository contained this experiment's description only; it is retained above. Work was done in a separate `poker-dots` checkout. The saved `contextm` environment was not modified.
+</details>
+
+---
+
+<p align="center">
+  <strong>POKER DOTS</strong><br />
+  <sub>An independently built game in a public AI-agent experiment.<br />
+  A small experiment in possibility.</sub>
+</p>
